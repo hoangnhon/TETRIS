@@ -11,15 +11,18 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
+
 public class PlayActivity extends AppCompatActivity {
 
     /*変数宣言 */
     final int defaultColor = Color.rgb(0,0,0);  //black
-    int[][] admin = new int[16][10];
+    int color;
+    final int[][] admin = new int[16][10];
     int score = 0;          //獲得したポイント
     int sleepTime = 1000;   //blockが落ちるスピード
     final int[] startY = {0};
-    int endRow = 16;        //初期化画面上の配列の行になる。blockが重なってきたら変えるもの
+    int endRow = 16 ;        //初期化画面上の配列の行になる。blockが重なってきたら変えるもの
     int[][] bl = null;  //現在のblock
     boolean gameOver = false;
     Blocks setblock = new Blocks();
@@ -216,12 +219,13 @@ public class PlayActivity extends AppCompatActivity {
         class showBlock extends Thread{
             public void run(){
                 while (!gameOver){
-//                    sleepTime = 1000;
                     bl = setblock.getblock();
-                    int color = new color().getColor();      //Yellow
+                    color = new color().getColor();      //Yellow
                     startY[0] = 0; //block[0][0]を配置する縦の位置
                     final int[] startX = { (10 - bl[0].length) / 2 };
-                    while (checkEndRow(startX[0]))/*((startY[0] +bl.length ) <= endRow)*/ {
+                    endRow = checkEndRow(startX[0]);
+                    System.out.println("endRow " + endRow);
+                    while ((startY[0] +bl.length ) <= endRow) {
                         setColor( startX[0], color);     //画面描画
                         try {   sleep(sleepTime); }              //時間を開ける
                         catch (InterruptedException e) {
@@ -240,6 +244,7 @@ public class PlayActivity extends AppCompatActivity {
                         left.setOnClickListener(v -> {
                             if (startX[0]>0){
                                 startX[0]--;
+                                endRow = checkEndRow(startX[0]);
                                 setColor( startX[0]+1, defaultColor);
                                 setColor( startX[0], color);
                             }
@@ -248,6 +253,7 @@ public class PlayActivity extends AppCompatActivity {
                         right.setOnClickListener( view ->{
                             if (startX[0]+bl[0].length<10){
                                 startX[0]++;
+                                endRow = checkEndRow(startX[0]);
                                 setColor(startX[0]-1, defaultColor);
                                 setColor( startX[0], color);
                             }
@@ -257,20 +263,20 @@ public class PlayActivity extends AppCompatActivity {
                             setColor(startX[0], defaultColor);
                             bl = setblock.turnedBlock();
                             startX[0] = (10- bl[0].length)/2;
+                            endRow = checkEndRow(startX[0]);
                             setColor(startX[0], color);
                         });
                         down.setOnClickListener( view ->{
-//                            sleepTime = sleepTime/10;
-//                            setColor(startX[0], defaultColor);
-//                            startY[0] = endRow - bl.length;
-//                            setColor(startX[0], color );
-//                            setAdmin(startX[0]);
+                            setColor(startX[0], defaultColor);
+                            startY[0] = endRow - bl.length;
+                            setColor(startX[0], color );
+                            setAdmin(startX[0]);
                         });
                     }//一つのブロックが最終点に到着するまでのwhile文　↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
                 }
             }//the end of run method ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
             public void stopRunning(){
-                if (endRow == 0){
+                if (endRow == 1){
                     gameOver = true;
                 }
             }
@@ -292,30 +298,41 @@ public class PlayActivity extends AppCompatActivity {
                     }
                 }
             }//the end of setAdmin method ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-            boolean checkEndRow(int startX){
-                for (int x = 0; x < bl[bl.length-1].length; x++){
-                    if (admin[startY[0]+ bl.length-1][startX + x]==1 && bl[bl.length-1][x]== 1) {
-                        endRow = startY[0]+ bl.length-1;
-                        return false;
+            int checkEndRow(int startX){
+                ArrayList<Integer> check = new ArrayList<>();
+                ArrayList<Integer> row = new ArrayList<>();
+                int y = bl.length-1;
+                for (int x = 0; x < bl[y].length; x++){
+                    for (int h = y; h >= 0; h-- ){
+                        if (bl[h][x] == 1){
+                            for (int i = 0; i < 16; i++){
+                                if (admin[i][startX+x] == 1 ){
+                                    check.add(i-h-1);
+                                    row.add(i);
+                                    break;
+                                }else if (admin[i][startX+x] == 0 && i == 15){
+                                    check.add(i-h-1);
+                                    row.add(i+1);
+                                }
+                            }
+                            break;
+                        }
                     }
                 }
-//                boolean nextRow = false;
-//                case1 : for (int i = endRow-1; i >=0; i--){
-//                    for (int x = 0; x<bl[bl.length-1].length; x++){
-//                        if (admin[i][startX+x] ==0) break case1;
-//                    }
-//                    endRow = i;
-//                }
-//                case2 : for (int i = endRow-1, y = bl.length-1; i>=0; i--){
-//                    for (int x = 0; x< bl[y].length; x++){
-//                        if (admin[i][startX+x] == 1 && bl[y][x]==1) {
-//                            endRow = i;
-//                            continue case2;
-//                        }
-//                    }
-//                    break ;
-//                }
-                return true;
+                int min = 16;
+                int end = 16;
+                for (int i = 0; i < check.size(); i++){
+                    if (check.get(i) < min){
+                        min = check.get(i);
+                        end = row.get(i);
+                    }
+                    else if (row.get(i)>end){
+                        end = row.get(i);
+                    }
+                }
+                check.removeAll(check);
+                row.removeAll(row);
+                return end ;
             }
         }//the end of showBlock class ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
         new showBlock().start();
