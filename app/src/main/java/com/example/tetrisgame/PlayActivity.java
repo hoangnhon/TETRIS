@@ -4,12 +4,19 @@ import static java.lang.Thread.sleep;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.FragmentActivity;
+
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
 
 public class PlayActivity extends AppCompatActivity {
 
@@ -21,6 +28,7 @@ public class PlayActivity extends AppCompatActivity {
     final int[] startY = {0};
     final int[] startX = {0};
     int[][] bl = null;  //現在のblock
+    int isClear = 0;
     Blocks setblock = new Blocks();
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -29,6 +37,8 @@ public class PlayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
 
+        FrameLayout tab = findViewById(R.id.tab);
+        ConstraintLayout layout = findViewById(R.id.layout);
         ImageView[][] Gview={//[0-15][0-9]
                 { findViewById(R.id.imageView0_0),
                     findViewById(R.id.imageView0_1),
@@ -214,55 +224,72 @@ public class PlayActivity extends AppCompatActivity {
 
         class showBlock extends Thread{
             Control ctl = new Control();
-            public void run(){
-                while (!ctl.isFull( bl = setblock.getblock(), startX[0] = (10 - bl[0].length) / 2)){
+            public void run() {
+                System.out.println(" run");
+                while (!ctl.isFull(bl = setblock.getblock(), startX[0] = (10 - bl[0].length) / 2)) {
                     sleepTime = 1000;
 //                    bl = setblock.getblock();
                     color = new color().getColor();      //Yellow
                     startY[0] = 0; //block[0][0]を配置する縦の位置
 //                    final int[] startX = { (10 - bl[0].length) / 2 };
                     System.out.println("new block");
-                    while (true){
-                        setColor( startX[0], color);     //画面描画
-                        try {   sleep(sleepTime); }              //時間を開ける
-                        catch (InterruptedException e) {    e.printStackTrace();    }
-                        if ( ctl.next(bl, startY[0], startX[0]) ){        //最終行の前だったら、次の行へ進む前に黒に戻す
-                            setColor( startX[0], defaultColor);
-                        }else {    //最終行に行った場合、admin[][]に状態を保存し、ループに抜ける
-                            ctl.setAdmin(bl, startY[0], startX[0]);
+                    while (true) {
+                        setColor(startX[0], color);     //画面描画
+                        try {
+                            sleep(sleepTime);
+                        }              //時間を開ける
+                        catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        if (ctl.next(bl, startY[0], startX[0])) {        //最終行の前だったら、次の行へ進む前に黒に戻す
+                            setColor(startX[0], defaultColor);
+                        } else {    //最終行に行った場合、admin[][]に状態を保存し、ループに抜ける
+                            isClear = ctl.setAdmin(bl, startY[0], startX[0], color);
                             break;
                         }
                         startY[0]++;
                         //left　Buttonが押された場合、block配置の横の位置が一個左にずらす
                         left.setOnClickListener(v -> {
-                            if (startX[0]>0){
+                            if (startX[0] > 0) {
                                 startX[0]--;
-                                setColor( startX[0]+1, defaultColor);
-                                setColor( startX[0], color);
+                                setColor(startX[0] + 1, defaultColor);
+                                setColor(startX[0], color);
                             }
                         });
                         //right　Buttonが押された場合、block配置の横の位置が一個右にずらす
-                        right.setOnClickListener( view ->{
-                            if (startX[0]+bl[0].length<10){
+                        right.setOnClickListener(view -> {
+                            if (startX[0] + bl[0].length < 10) {
                                 startX[0]++;
-                                setColor(startX[0]-1, defaultColor);
-                                setColor( startX[0], color);
+                                setColor(startX[0] - 1, defaultColor);
+                                setColor(startX[0], color);
                             }
                         });
                         //blockの向きを変えるボタン
-                        turn.setOnClickListener( view ->{
+                        turn.setOnClickListener(view -> {
                             setColor(startX[0], defaultColor);
                             bl = setblock.turnedBlock();
-                            if (bl[0].length > bl.length && startX[0] == 10- bl.length){
-                                startX[0] += bl[0].length - bl.length;
+                            if (bl[0].length > bl.length && startX[0] == 10 - bl.length) {
+                                startX[0] -= (bl[0].length - bl.length);
                             }
                             setColor(startX[0], color);
                         });
-                        down.setOnClickListener( view ->{
-                            sleepTime = sleepTime/10;
+                        down.setOnClickListener(view -> {
+                            sleepTime = sleepTime / 10;
                         });
                     }//一つのブロックが最終点に到着するまでのwhile文　↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+                    if (isClear != 0) {
+                        System.out.println("clearメソッドの戻り値" + isClear);
+                        clear();
+                    }
                 }
+                score = ctl.getScore();
+                Intent gotoScore = new Intent(getApplicationContext(), HighscoreActivity.class);
+                gotoScore.putExtra("score", score);
+                tab.setVisibility(View.VISIBLE);
+//                layout.setOnTouchListener(v->
+                    startActivity(gotoScore);
+//                );
+                return;
             }//the end of run method ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
             void setColor( int startX, int color){
                 for (int y = 0; y < bl.length; y++){
@@ -273,8 +300,28 @@ public class PlayActivity extends AppCompatActivity {
                     }
                 }
             }// the end of setColor method ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+            void clear(){
+                ctl.clear();
+                for (int y=0; y<16; y++){
+                    int[][] admin = ctl.getAdmin();
+                    int[][] color = ctl.getColor();
+                    for (int x=0; x<10; x++){
+                        Gview[y][x].setBackgroundColor(defaultColor);
+                        if (admin[y][x] == 1){
+                            Gview[y][x].setBackgroundColor(color[y][x]);
+                        }
+                    }
+                }
+            }
         }//the end of showBlock class ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-        new showBlock().start();
+        showBlock showBlock = new showBlock();
+        showBlock.start();
+//        try {
+//            showBlock.join();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        System.out.println(" return ");
 //        Intent gotoHighScore = new Intent(getApplicationContext(), HighscoreActivity.class);
 //        gotoHighScore.putExtra("score",score);
 //        startActivity(gotoHighScore);
