@@ -5,14 +5,15 @@ import android.graphics.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Control {
+public class Control extends Thread{
     boolean[] status = new boolean[16];
     int[][] admin = new int[16][10];
     int[][] color = new int[16][10];
-    final int defaultColor = Color.rgb(0,0,0);  //black
+    final int dflClr = Color.rgb(105,105,105);  //grey
     private int score = 0;
     ArrayList<Integer> clearRow = new ArrayList<>();
     public int setAdmin(int[][] bl, int starty, int startx, int color){
+        System.out.println(" set admin ");
         for (int y=0; y<bl.length; y++){
             for (int x=0; x<bl[y].length; x++){
                 if (bl[y][x] == 1){
@@ -21,6 +22,13 @@ public class Control {
                 }
             }
         }
+        for (int[] y : admin){
+            for (int x : y){
+                System.out.print(x + "\t");
+            }
+            System.out.println();
+        }
+        setScore();
         return isClear(starty, starty+bl.length);
     }
     public int isClear(int y, int cnt){
@@ -39,7 +47,7 @@ public class Control {
     void clear(){
         Collections.reverse(clearRow);
         int[] empty = {0,0,0,0,0,0,0,0,0,0};
-        int[] resetcolor = {defaultColor,defaultColor,defaultColor,defaultColor,defaultColor,defaultColor,defaultColor,defaultColor,defaultColor,defaultColor};
+        int[] resetcolor = {dflClr, dflClr, dflClr, dflClr, dflClr, dflClr, dflClr, dflClr, dflClr, dflClr};
         int line = clearRow.get(0);
         for (int y=line-1; y>=0; y--){
             if (!status[y]){
@@ -50,25 +58,63 @@ public class Control {
             admin[y] = empty;
             color[y] = resetcolor;
         }
+        for (int[] y : admin){
+            for (int x : y){
+                System.out.print(x + "\t");
+            }
+            System.out.println();
+        }
+        status = new boolean[16];
         clearRow.clear();
     }
-    public boolean next(int[][] bl, int starty, int startx){
-        int y=bl.length-1;
-        if (starty+y ==15){
+    public boolean hasNext(int[][] bl, int starty, int startx){
+        System.out.println("has Next ?");
+        if (starty+bl.length ==16){
             return false;
         }
-        boolean cmd = true;
         for (int x=0; x<bl[0].length; x++){
-            for (y=bl.length-1; y>=0; y--) {
+            for (int y=bl.length-1; y>=0; y--) {
                 if (admin[starty+y+1][startx+x] ==1 && bl[y][x] ==1){
                     return false;
                 }
-                if (admin[starty+y][startx+x] ==1 && bl[y][x] ==0){
+                if (admin[starty+y+1][startx+x] ==1 && bl[y][x] ==0){
                     continue;
                 }else break;
             }
         }
-        return cmd;
+        return true;
+    }
+    public boolean hasLeft(int[][] bl, int starty, int startx){
+        if (startx == 0){
+            return false;
+        }
+        for (int y =0; y< bl.length; y++){
+            for (int x=0; x < bl[0].length; x++){
+                if (admin[starty+y][startx+x-1] ==1  && bl[y][x] ==1){
+                    return false;
+                }
+                if (admin[starty+y][startx+x-1] ==1 && bl[y][x] ==0){
+                    continue;
+                }else break;
+            }
+        }
+        return true;
+    }
+    public boolean hasRight(int[][] bl, int starty, int startx){
+        if (startx + bl[0].length == 10){
+            return false;
+        }
+        for (int y=0; y< bl.length; y++){
+            for (int x=bl[0].length-1 ; x>=0; x--){
+                if (admin[starty+y][startx+x+1] ==1 && bl[y][x] ==1){
+                    return false;
+                }
+                if (admin[starty+y][startx+x+1] ==1 && bl[y][x] ==0){
+                    continue;
+                }else break;
+            }
+        }
+        return true;
     }
     public boolean isFull(int[][] bl, int startx){
         for (int x=0; x<bl[0].length; x++ ){
@@ -79,6 +125,9 @@ public class Control {
         }
         System.out.println("not full");
         return false;
+    }
+    void setScore(){
+        score +=5;
     }
     int getScore(){
         return score;

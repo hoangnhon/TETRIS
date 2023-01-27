@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/status"
+        android:icon="@android:drawable/ic_media_pause"
+        android:orderInCategory="1"
+        android:title="PAUSE"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/home"
+        android:icon="@drawable/ic_baseline_home_24"
+        android:orderInCategory="3"
+        android:title="HOME"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/music"
+        android:icon="@drawable/ic_baseline_volume_up_24"
+        android:orderInCategory="2"
+        android:title="MUSIC"
+        app:showAsAction="ifRoom" />
+</menu>

@@ -55,6 +55,7 @@ public class Blocks{
     int[][][] currentBlock;
     int index;
     int[][] getblock(){
+        System.out.println("get Block ");
         currentBlock = list[(int)(Math.random()*list.length)];
         index = (int)(Math.random()* currentBlock.length);
         return currentBlock[index];
@@ -66,24 +67,14 @@ public class Blocks{
 }
 class color{
     final int[] colorList = {   Color.rgb(255,255,0),   //Yellow
-                                Color.rgb(255,20,147),   //deeppink
-                                Color.rgb(0,255,255),   //aqua
+                                Color.rgb(242,75,184),   //deeppink
                                 Color.rgb(0,255,0),     //lime
                                 Color.rgb(255,140,0),   //darkorange
-                                Color.rgb(30,144,255),  //dodgerblue
-                                Color.rgb(153,255,255),
-                                Color.rgb(255,255,204),
-                                Color.rgb(255,105,180), //hotpink
-                                Color.rgb(143,188,143)  //darkseagreen
+                                Color.rgb(5,219,242),  //dodgerblue
+                                Color.rgb(121,65,242),  //puple
     };
 
     int getColor(){
-        return colorList[(int)(Math.random()*10)];
-    }
-}
-class Score{
-    int score ;
-    void setScore(){
-
+        return colorList[(int)(Math.random()*6)];
     }
 }

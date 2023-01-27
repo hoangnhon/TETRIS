@@ -4,17 +4,45 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/photo3"
+    tools:context=".Game">
+
 
     <Button
-        android:id="@+id/playBtn"
+        android:id="@+id/PlayBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="185dp"
-        android:layout_marginTop="360dp"
-        android:layout_marginEnd="138dp"
-        android:text="START"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="540dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/button"
+        android:shadowColor="#F44336"
+        android:shadowRadius="@dimen/material_emphasis_disabled"
+        android:text="PLAY"
+        android:textColor="@color/white"
+        android:textSize="26sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/Animation.Design.BottomSheetDialog" />
+
+    <Button
+        android:id="@+id/ScoreBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="130dp"
+        android:layout_marginTop="19dp"
+        android:layout_marginEnd="130dp"
+        android:background="@drawable/button"
+        android:text="Score List :"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/PlayBtn" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
