@@ -1,7 +1,5 @@
 package com.example.tetrisgame;
 
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -10,9 +8,8 @@ import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.ImageButton;
 import java.io.IOException;
 
 public class MainScreen extends AppCompatActivity {
@@ -20,8 +17,8 @@ public class MainScreen extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     SharedPreferences musicPref;
     SharedPreferences.Editor musicsetting;
-    int pauseIcon = android.R.drawable.ic_media_play;
-    int playIcon = android.R.drawable.ic_media_pause;
+    int music_offIcon = R.drawable.ic_baseline_volume_off_24;
+    int music_onIcon = R.drawable.ic_baseline_volume_up_24;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +28,7 @@ public class MainScreen extends AppCompatActivity {
         //画面上のパーツ宣言
         Button playBtn = findViewById(R.id.PlayBtn);
         Button ScoreBtn = findViewById(R.id.ScoreBtn);
-
+        ImageButton music = findViewById(R.id.music);
         //インテントの宣言
         Intent PlayIntent = new Intent(getApplicationContext(), PlayScreen.class);
         Intent ScoreIntent = new Intent(getApplicationContext(), ScoreScreen.class);
@@ -55,8 +52,11 @@ public class MainScreen extends AppCompatActivity {
         musicPref = getSharedPreferences("musicStatus",Context.MODE_PRIVATE);
         musicsetting = musicPref.edit();
         if (musicPref.getBoolean("music",false)) {
+            music.setImageResource(music_onIcon);
             mediaPlayer.start();
             mediaPlayer.setLooping(true);
+        }else{
+            music.setImageResource(music_offIcon);
         }
         playBtn.setOnClickListener(v->{
             mediaPlayer.stop();
@@ -66,27 +66,17 @@ public class MainScreen extends AppCompatActivity {
             mediaPlayer.stop();
             startActivity(ScoreIntent);
         });
-    }
-    @Override
-    public boolean onCreateOptionsMenu(@NonNull Menu menu){
-        getMenuInflater().inflate(R.menu.music_setting,menu);
-        return true;
-    }
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item){
-        if (item.getItemId() == R.id.music){
-            System.out.println("music ボタンを押しました！");
+        music.setOnClickListener(v->{
             if (musicPref.getBoolean("music",false)){
+                music.setImageResource(music_offIcon);
                 musicsetting.putBoolean("music",false).apply();
                 mediaPlayer.pause();
-                System.out.println("            PAUSE            ");
             }else{
+                music.setImageResource(music_onIcon);
                 musicsetting.putBoolean("music",true).apply();
                 mediaPlayer.start();
                 mediaPlayer.setLooping(true);
-                System.out.println("            PLAY             ");
             }
-        }
-        return true;
+        });
     }
 }

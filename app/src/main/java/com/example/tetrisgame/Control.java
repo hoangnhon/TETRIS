@@ -9,11 +9,10 @@ public class Control extends Thread{
     boolean[] status = new boolean[16];
     int[][] admin = new int[16][10];
     int[][] color = new int[16][10];
-    final int dflClr = Color.rgb(105,105,105);  //grey
+    final int dflClr = Color.rgb(64,64,64);  //grey105
     private int score = 0;
     ArrayList<Integer> clearRow = new ArrayList<>();
     public int setAdmin(int[][] bl, int starty, int startx, int color){
-        System.out.println(" set admin ");
         for (int y=0; y<bl.length; y++){
             for (int x=0; x<bl[y].length; x++){
                 if (bl[y][x] == 1){
@@ -21,12 +20,6 @@ public class Control extends Thread{
                     this.color[starty+y][startx+x] = color;
                 }
             }
-        }
-        for (int[] y : admin){
-            for (int x : y){
-                System.out.print(x + "\t");
-            }
-            System.out.println();
         }
         setScore();
         return isClear(starty, starty+bl.length);
@@ -41,7 +34,7 @@ public class Control extends Thread{
             status[y] = true;
             clearRow.add(y);
         }
-        score += 1000*clearRow.size();
+        score += 100*clearRow.size();
         return clearRow.size();
     }
     void clear(){
@@ -58,17 +51,10 @@ public class Control extends Thread{
             admin[y] = empty;
             color[y] = resetcolor;
         }
-        for (int[] y : admin){
-            for (int x : y){
-                System.out.print(x + "\t");
-            }
-            System.out.println();
-        }
         status = new boolean[16];
         clearRow.clear();
     }
     public boolean hasNext(int[][] bl, int starty, int startx){
-        System.out.println("has Next ?");
         if (starty+bl.length ==16){
             return false;
         }
@@ -116,16 +102,16 @@ public class Control extends Thread{
         }
         return true;
     }
-    public boolean isFull(int[][] bl, int startx){
-        for (int x=0; x<bl[0].length; x++ ){
-            if (admin[bl.length][startx+x] == 1) {
-                System.out.println("is full");
-                return true;
-            }
-        }
-        System.out.println("not full");
-        return false;
-    }
+//    public boolean isFull(int[][] bl, int startx){
+//        for (int x=0; x<bl[0].length; x++ ){
+//            if (admin[bl.length][startx+x] == 1) {
+//                System.out.println("is full");
+//                return true;
+//            }
+//        }
+//        System.out.println("not full");
+//        return false;
+//    }
     void setScore(){
         score +=5;
     }

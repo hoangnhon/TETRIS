@@ -12,20 +12,17 @@
         android:id="@+id/linearLayout"
         android:layout_width="312dp"
         android:layout_height="490dp"
-        android:layout_marginStart="50dp"
         android:layout_marginTop="30dp"
-        android:layout_marginEnd="50dp"
         android:background="@drawable/backgrounds"
         android:orientation="horizontal"
         android:padding="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="30dp"
             android:layout_height="480dp"
-            android:background="#C8C8C8"
+            android:background="#404040"
             android:orientation="vertical">
 
             <ImageView
@@ -177,7 +174,7 @@
         <LinearLayout
             android:layout_width="30dp"
             android:layout_height="480dp"
-            android:background="#C8C8C8"
+            android:background="#404040"
             android:orientation="vertical">
 
             <ImageView
@@ -329,7 +326,7 @@
         <LinearLayout
             android:layout_width="30dp"
             android:layout_height="480dp"
-            android:background="#C8C8C8"
+            android:background="#404040"
             android:orientation="vertical">
 
             <ImageView
@@ -481,7 +478,7 @@
         <LinearLayout
             android:layout_width="30dp"
             android:layout_height="480dp"
-            android:background="#C8C8C8"
+            android:background="#404040"
             android:orientation="vertical">
 
             <ImageView
@@ -633,7 +630,7 @@
         <LinearLayout
             android:layout_width="30dp"
             android:layout_height="480dp"
-            android:background="#C8C8C8"
+            android:background="#404040"
             android:orientation="vertical">
 
             <ImageView
@@ -736,6 +733,12 @@
                 app:srcCompat="@android:drawable/divider_horizontal_dark" />
 
             <ImageView
+                android:id="@+id/dimview"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:srcCompat="@android:drawable/ic_delete" />
+
+            <ImageView
                 android:id="@+id/imageView11_4"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
@@ -785,7 +788,7 @@
         <LinearLayout
             android:layout_width="30dp"
             android:layout_height="480dp"
-            android:background="#C8C8C8"
+            android:background="#404040"
             android:orientation="vertical">
 
             <ImageView
@@ -937,7 +940,7 @@
         <LinearLayout
             android:layout_width="30dp"
             android:layout_height="480dp"
-            android:background="#C8C8C8"
+            android:background="#404040"
             android:orientation="vertical">
 
             <ImageView
@@ -1089,7 +1092,7 @@
         <LinearLayout
             android:layout_width="30dp"
             android:layout_height="480dp"
-            android:background="#C8C8C8"
+            android:background="#404040"
             android:orientation="vertical">
 
             <ImageView
@@ -1241,7 +1244,7 @@
         <LinearLayout
             android:layout_width="30dp"
             android:layout_height="480dp"
-            android:background="#C8C8C8"
+            android:background="#404040"
             android:orientation="vertical">
 
             <ImageView
@@ -1393,7 +1396,7 @@
         <LinearLayout
             android:layout_width="30dp"
             android:layout_height="480dp"
-            android:background="#C8C8C8"
+            android:background="#404040"
             android:orientation="vertical">
 
             <ImageView
@@ -1544,21 +1547,6 @@
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="220dp"
-        android:layout_marginBottom="280dp"
-        android:background="@drawable/backgrounds"
-        android:padding="5dp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/red" />
-
 
     <ImageButton
         android:id="@+id/left"
@@ -1609,7 +1597,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"
         app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@android:drawable/ic_menu_rotate"
+        app:srcCompat="@drawable/ic_baseline_rotate_right_24"
         tools:ignore="DuplicateIds,MissingConstraints" />
 
     <ImageButton
@@ -1652,6 +1640,64 @@
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/scoreText"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/GameOver"
+        android:layout_width="395dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="150dp"
+        android:layout_marginBottom="180dp"
+        android:background="@drawable/gameover2copy"
+        android:fontFamily="sans-serif-condensed-medium"
+        android:textAlignment="center"
+        android:textSize="34sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="170dp"
+        android:padding="5dp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/gificon" />
+
+    <ImageButton
+        android:id="@+id/musicBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:backgroundTint="@color/cardview_dark_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/staticBtn"
+        app:srcCompat="@drawable/ic_baseline_volume_up_24" />
+
+    <ImageButton
+        android:id="@+id/homeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:backgroundTint="@color/cardview_dark_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/musicBtn"
+        app:srcCompat="@drawable/ic_baseline_home_24" />
+
+    <ImageButton
+        android:id="@+id/staticBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="@color/cardview_dark_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_play" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

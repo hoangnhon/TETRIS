@@ -15,11 +15,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.IOException;
+
+import kotlin.jvm.Synchronized;
 
 public class PlayScreen extends AppCompatActivity {
 
@@ -28,6 +32,7 @@ public class PlayScreen extends AppCompatActivity {
     int color;
     int score = 0;          //獲得したポイント
     int sleepTime = 1000;   //blockが落ちるスピード
+    int busyLine = 15;
     final int[] startY = {0};
     final int[] startX = {0};
     int[][] bl = null;  //現在のblock
@@ -37,26 +42,29 @@ public class PlayScreen extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     SharedPreferences musicPref ;
     SharedPreferences.Editor musicsetting ;
-    MenuItem statusItem = findViewById(R.id.status);
-    MenuItem musicItem = findViewById(R.id.music);
-    int pauseIcon = android.R.drawable.ic_media_play;
-    int playIcon = android.R.drawable.ic_media_pause;
-//    int music_offIcon = android.R.drawable.ic_lock_silent_mode_off;
-//    int music_onIcon = drawable.ic;
+    int pauseIcon = R.drawable.ic_pause;
+    int playIcon = R.drawable.ic_play;
+    int music_offIcon = R.drawable.ic_baseline_volume_off_24;
+    int music_onIcon = R.drawable.ic_baseline_volume_up_24;
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+//    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_screen);
-
+        //画面上のパーツ宣言
+        TextView GameOver = findViewById(R.id.GameOver);
         TextView scoreText = findViewById(R.id.scoreText);
-        ImageView tab = findViewById(R.id.imageView);
+        ImageView gameOverIcon = findViewById(R.id.imageView);
         ImageButton left = findViewById(R.id.left);
         ImageButton right = findViewById(R.id.right);
         ImageButton turn = findViewById(R.id.turn);
         ImageButton down = findViewById(R.id.down);
-        tab.setAlpha(0f);
+        ImageButton staticBtn = findViewById(R.id.staticBtn);
+        ImageButton musicBtn = findViewById(R.id.musicBtn);
+        ImageButton homeBtn = findViewById(R.id.homeBtn);
+        GameOver.setAlpha(0f);
+        gameOverIcon.setAlpha(0f);
         ImageView[][] Gview={//[0-15][0-9]
                 { findViewById(R.id.imageView0_0),
                     findViewById(R.id.imageView0_1),
@@ -255,24 +263,22 @@ public class PlayScreen extends AppCompatActivity {
             e1.printStackTrace();
         }
         if (musicPref.getBoolean("music",false)) {
+            musicBtn.setImageResource(music_onIcon);
             mediaPlayer.start();
             mediaPlayer.setLooping(true);
+        }else{
+            musicBtn.setImageResource(music_offIcon);
         }
         // MusicControl ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-
 
         class showBlock extends Thread{
             Control ctl = new Control();
             public void run() {
-                System.out.println(" run");
-                while (!ctl.isFull(bl = setblock.getblock(), startX[0] = (10 - bl[0].length) / 2)) {
-                    System.out.println("set sleepTime");
+                while (ctl.hasNext(bl = setblock.getblock(),startY[0] = 0 , startX[0]=(10-bl[0].length)/2)){
+//                while (!ctl.isFull(bl = setblock.getblock(), startX[0] = (10 - bl[0].length) / 2)) {
                     sleepTime = 1000;
-                    System.out.println("get new color");
                     color = new color().getColor();      //Yellow
-                    System.out.println("set start Y = 0");
-                    startY[0] = 0; //block[0][0]を配置する縦の位置
-                    System.out.println("new block 描画");
+//                    startY[0] = 0; //block[0][0]を配置する縦の位置
                     while (true) {
                         setColor(startX[0], color);     //画面描画
                         if (status) {
@@ -286,12 +292,13 @@ public class PlayScreen extends AppCompatActivity {
                                 setColor(startX[0], defaultColor);
                             } else {    //最終行に行った場合、admin[][]に状態を保存し、ループに抜ける
                                 isClear = ctl.setAdmin(bl, startY[0], startX[0], color);
+                                busyLine = Math.min(startY[0], busyLine);
                                 break;
                             }
                             startY[0]++;
                             //left　Buttonが押された場合、block配置の横の位置が一個左にずらす
                             left.setOnClickListener(v -> {
-                                if (ctl.hasLeft(bl, startY[0], startX[0])) {
+                                if (status && ctl.hasLeft(bl, startY[0], startX[0])) {
                                     startX[0]--;
                                     setColor(startX[0] + 1, defaultColor);
                                     setColor(startX[0], color);
@@ -299,8 +306,7 @@ public class PlayScreen extends AppCompatActivity {
                             });
                             //right　Buttonが押された場合、block配置の横の位置が一個右にずらす
                             right.setOnClickListener(view -> {
-                                if (ctl.hasRight(bl, startY[0], startX[0])) {
-                                    //if (startX[0] + bl[0].length < 10) {
+                                if (status && ctl.hasRight(bl, startY[0], startX[0])) {
                                     startX[0]++;
                                     setColor(startX[0] - 1, defaultColor);
                                     setColor(startX[0], color);
@@ -308,29 +314,41 @@ public class PlayScreen extends AppCompatActivity {
                             });
                             //blockの向きを変えるボタン
                             turn.setOnClickListener(view -> {
-                                setColor(startX[0], defaultColor);
-                                bl = setblock.turnedBlock();
-                                if (bl[0].length > bl.length && startX[0] == 10 - bl.length) {
-                                    startX[0] -= (bl[0].length - bl.length);
+                                if (status) {
+                                    setColor(startX[0], defaultColor);
+                                    bl = setblock.turnedBlock();
+                                    if (bl[0].length > bl.length && startX[0] == 10 - bl.length) {
+                                        startX[0] -= (bl[0].length - bl.length);
+                                    }
+                                    setColor(startX[0], color);
                                 }
-                                setColor(startX[0], color);
                             });
                             down.setOnClickListener(view -> {
                                 sleepTime = sleepTime / 10;
                             });
                         }
                     }//一つのブロックが最終点に到着するまでのwhile文　↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-                    System.out.println("scoreText.setText");
-                    scoreText.setText(Integer.toString(score = ctl.getScore()));
                     if (isClear != 0) {
-                        System.out.println("clearメソッドの戻り値" + isClear);
                         clear();
                     }
+                    scoreText.setText(Integer.toString(score = ctl.getScore()));
                 }
+                GameOver.setAlpha(1f);
                 scoreText.setText(Integer.toString(score = ctl.getScore()));
-                tab.setAlpha(1f);
+                RotateAnimation rotate = new RotateAnimation(0.0f, 360.0f,
+                                                                Animation.RELATIVE_TO_SELF, 0.5f,
+                                                                Animation.RELATIVE_TO_SELF, 0.5f);
+                gameOverIcon.setAlpha(1f);
+                // RotateAnimationRotateAnimation
+                rotate.setDuration(3000);
+                // 繰り返す
+                rotate.setRepeatCount(5);
+                // animationが終わったそのまま表示にする
+                rotate.setFillAfter(true);
+                //アニメーションの開始
+                gameOverIcon.startAnimation(rotate);
                 try{
-                    sleep(2000);
+                    sleep(3000);
                 }catch(InterruptedException e){
                     e.printStackTrace();
                 }
@@ -341,7 +359,6 @@ public class PlayScreen extends AppCompatActivity {
                 startActivity(gotoScore);
             }// run method ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
             void setColor( int startX, int color){
-                System.out.println("set color");
                 for (int y = 0; y < bl.length; y++) {
                     for (int x = 0; x < bl[y].length; x++) {
                         if (bl[y][x] == 1) {
@@ -356,52 +373,37 @@ public class PlayScreen extends AppCompatActivity {
                     int[][] admin = ctl.getAdmin();
                     int[][] color = ctl.getColor();
                     for (int x=0; x<10; x++){
-                        Gview[y][x].setBackgroundColor(defaultColor);
-                        if (admin[y][x] == 1){
                             Gview[y][x].setBackgroundColor(color[y][x]);
-                        }
                     }
                 }
-                scoreText.setText(Integer.toString(score = ctl.getScore()));
             }
         }//the end of showBlock class ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-
+        staticBtn.setOnClickListener(v->{
+            if (status){
+                staticBtn.setImageResource(pauseIcon);
+                status = false;
+            }else{
+                staticBtn.setImageResource(playIcon);
+                status = true;
+            }
+        });
+        musicBtn.setOnClickListener(v->{
+            if (musicPref.getBoolean("music",false)){
+                musicBtn.setImageResource(music_offIcon);
+                musicsetting.putBoolean("music", false).apply();
+                mediaPlayer.pause();
+            }else {
+                musicBtn.setImageResource(music_onIcon);
+                musicsetting.putBoolean("music", true).apply();
+                mediaPlayer.start();
+                mediaPlayer.setLooping(true);
+            }
+        });
+        homeBtn.setOnClickListener(v->{
+            Intent returnHome = new Intent(getApplicationContext(),MainScreen.class);
+            mediaPlayer.stop();
+            startActivity(returnHome);
+        });
         new showBlock().start();
-    }
-    @Override
-    public boolean onCreateOptionsMenu(@NonNull Menu menu){
-        getMenuInflater().inflate(R.menu.option_menu,menu);
-        return true;
-    }
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item){
-
-        switch (item.getItemId()){
-            case R.id.status:
-                if (status){
-                    statusItem.setIcon(pauseIcon);
-                    status = false;
-                }else{
-                    statusItem.setIcon(playIcon);
-                    status = true;
-                }
-                break;
-            case R.id.music:
-                if (musicPref.getBoolean("music",false)){
-                    musicsetting.putBoolean("music", false).apply();
-                    mediaPlayer.pause();
-                }else {
-                    musicsetting.putBoolean("music", true).apply();
-                    mediaPlayer.start();
-                    mediaPlayer.setLooping(true);
-                }
-                break;
-            case R.id.home:
-                Intent returnHome = new Intent(getApplicationContext(),MainScreen.class);
-                mediaPlayer.stop();
-                startActivity(returnHome);
-                break;
-        }
-        return true;
     }
 }
